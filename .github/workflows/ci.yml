@@ -1,0 +1,17 @@
+name: CI Test
+
+on:
+  push:
+    branches:
+      - principal
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout du dépôt
+      uses: actions/checkout@v4  # Version mise à jour
+
+    - name: Test simple
+      run: echo "CI Pipeline exécuté avec succès !"

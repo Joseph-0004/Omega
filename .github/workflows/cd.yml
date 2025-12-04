@@ -1,0 +1,31 @@
+name: Deploy to InfinityFree
+
+on:
+  push:
+    branches:
+      - principal
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Version mise à jour
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6  # Version la plus récente
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./  # Dossier local à uploader (tout le repo, ajuste si besoin)
+          server-dir: /htdocs/  # Ajuste selon ton dossier racine sur InfinityFree (ex. /htdocs/ ou /www/mon-site/)
+          protocol: ftp  # Ou 'ftps' si ton serveur supporte l'encryption
+          port: 21
+          dry-run: false  # Mets 'true' pour tester sans déployer vraiment
+          exclude: |  # Exclut les fichiers inutiles pour éviter les erreurs
+            **/.git*
+            **/.github**
+            **/node_modules/**
