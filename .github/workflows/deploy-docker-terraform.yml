@@ -2,7 +2,7 @@ name: Build & Deploy demo-devops with Terraform
 
 on:
   push:
-    branches: [ principal ]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ──────── DOCKER ────────
+      # ──────── DOCKER (CORRIGÉ POUR TON PSEUDO) ────────
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -29,7 +29,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/demo-devops:latest
+          # LE SEUL TAG QUI MARCHE CHEZ TOI (tout en minuscules)
+          tags: ghcr.io/joseph-0004/demo-devops:latest
 
       # ──────── TERRAFORM ────────
       - name: Setup Terraform
@@ -44,5 +45,4 @@ jobs:
         run: terraform apply -auto-approve
         env:
           TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
-          TF_VAR_github_username: ${{ github.repository_owner }}
           TF_VAR_ssh_key_name: ${{ secrets.SSH_KEY_NAME }}
