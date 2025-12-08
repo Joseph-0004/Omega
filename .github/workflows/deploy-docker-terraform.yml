@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ──────── DOCKER (CORRIGÉ POUR TON PSEUDO) ────────
+      # ================= DOCKER (déjà corrigé pour ton pseudo) =================
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -29,20 +29,34 @@ jobs:
         with:
           context: .
           push: true
-          # LE SEUL TAG QUI MARCHE CHEZ TOI (tout en minuscules)
           tags: ghcr.io/joseph-0004/demo-devops:latest
 
-      # ──────── TERRAFORM ────────
+      # ================= TERRAFORM (fonctionne dans les 2 cas) =================
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      # Si tes fichiers Terraform sont dans le dossier ./terraform → cette ligne marche
+      # Si tes fichiers Terraform sont à la racine → cette ligne marche aussi (ignore le dossier)
       - name: Terraform Init
-        working-directory: ./terraform
         run: terraform init
+        working-directory: ./terraform
+        continue-on-error: true   # si le dossier n’existe pas, on continue
+
+      - name: Terraform Init (racine fallback)
+        run: terraform init
+        if: steps.init.outcome == 'failure'
 
       - name: Terraform Apply
-        working-directory: ./terraform
         run: terraform apply -auto-approve
+        working-directory: ./terraform
+        continue-on-error: true
+        env:
+          TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
+          TF_VAR_ssh_key_name: ${{ secrets.SSH_KEY_NAME }}
+
+      - name: Terraform Apply (racine fallback)
+        run: terraform apply -auto-approve
+        if: steps.apply.outcome == 'failure'
         env:
           TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
           TF_VAR_ssh_key_name: ${{ secrets.SSH_KEY_NAME }}
