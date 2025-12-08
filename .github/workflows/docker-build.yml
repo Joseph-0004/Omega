@@ -27,4 +27,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/joseph-0004/demo-devops:latest
+          tags: ghcr.io/Joseph-0004/demo-devops:latest
